@@ -1,0 +1,98 @@
+<html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Flask App{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body class="bg-light">
+    <header class="sticky-top container">
+        <nav class="navbar navbar-light">
+            <div class="container-fluid">
+                <a class="btn btn-primary" href="{{ url_for('main.main_route') }}">На главную</a>
+                <form class="d-flex search-form" action="{{url_for('main.search')}}">
+                    <input class="form-control me-2" type="search" placeholder="Введите автора, название или жанр книги" aria-label="Поиск" name="query" required>
+                    <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
+                </form>
+                <div class="header-buttons">
+                {% if current_user.is_authenticated %}
+                    <a class="btn btn-primary" href="{{ url_for('main.cart') }}">Корзина</a>
+                    <a class="btn btn-primary" href="{{ url_for('main.orders') }}">Заказы</a>
+                    <a class="btn btn-danger" href="{{ url_for('main.logout') }}" onclick="return confirm('Вы уверены, что хотите выйти?')">Выход</a>
+                {% else %}
+                    <a class="btn btn-primary" href="{{ url_for('main.login') }}">Вход</a>
+                    <a class="btn btn-primary" href="{{ url_for('main.register') }}">Регистрация</a>
+                {% endif %}
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container-xxl my-4" style="min-height: 550px;">
+        <div class="row">
+            <aside class="col-3 side-bar">
+                <div class="bd-links">
+                    <ul class="list-unstyled mb-0 py-3 pt-md-1">
+                        {% for genre in genres %}
+                        <li class="mb-1">
+                            <button class="btn d-inline-flex align-items-center rounded section" data-bs-toggle="collapse" data-bs-target="#{{ genre }}" aria-expanded="{% if genre==section %}true{% else %}false{% endif %}">
+                              {{ genres[genre][0] }}
+                            </button>
+                            <div class="collapse {% if genre==section %}show{% endif %}" id="{{ genre }}">
+                              <ul class="list-unstyled fw-normal pb-1 mt-1 small">
+                                  {% for subgenre in genres[genre][1] %}
+                                  <li class="mt-1"><a href="{{ url_for('main.show_subsection', section=genre, subsection=subgenre) }}" {% if subgenre==subsection %}autofocus{% endif %}>{{ genres[genre][1][subgenre].capitalize() }}</a></li>
+                                  {% endfor %}
+                              </ul>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </aside>
+            <main class="col-9">
+                    {% block content %}{% endblock %}
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                      {% if messages %}
+                        {% for category, message in messages %}<div class="alert alert-{{ category }}">{{ message }}</div>{% endfor %}
+                      {% endif %}
+                    {% endwith %}
+            </main>
+        </div>
+    </div>
+    <footer class="footer">
+        <div class="footer-column">
+            <div class="footer-container">
+                <div class="text-center" style="width: 100%;">Связаться с нами:</div>
+                <div class="contact">
+                    <i class="bi bi-instagram footer-icon"></i>
+                    <i class="bi bi-facebook footer-icon"></i>
+                    <i class="bi bi-whatsapp footer-icon"></i>
+                    <i class="bi bi-telegram footer-icon"></i>
+                </div>
+            </div>
+            <div class="footer-container">
+                Принимаем к оплате:
+                <div class="payment-methods">
+                    <div class="method"><img src="{{ url_for('static', filename='img/visa.svg') }}" alt="логотип visa"></div>
+                    <div class="method"><img src="{{ url_for('static', filename='img/master-card.svg') }}" alt="логотип master-card"></div>
+                    <div class="method"><img src="{{ url_for('static', filename='img/paypal.svg') }}" alt="логотип paypal"></div>
+                    <div class="method"><img src="{{ url_for('static', filename='img/payoneer.svg') }}" alt="логотип payoneer"></div>
+                </div>
+            </div>
+        </div>
+        <div>
+            Способы доставки:
+            <ul>
+                <li>самовывоз</li>
+                <li>до двери</li>
+            </ul>
+        </div>
+    </footer>
+    {% block extra_js %}{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</body>
+</html>

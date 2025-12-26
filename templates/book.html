@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Book{% endblock %}
+
+{% block content %}
+    <div class="container mb-5">
+        <div class="row g-0">
+            <div class="col-md-3">
+              <img src="{{ url_for('static', filename=book.cover) }}" class="img-fluid cover" alt="обложка книги">
+            </div>
+            <div class="col-md-9">
+                <div class="card-body">
+                    <h3>{{ book.title.capitalize() }}</h3>
+                    <h5>{{ book.author.title() }}</h5>
+                    {% if book.rating %}
+                        <span title="Рейтинг: {{ book.rating }}" style="color: orange;">
+                          <i class="bi {{convert_to_star(1, book.rating)}}"></i>
+                          <i class="bi {{convert_to_star(2, book.rating)}}"></i>
+                          <i class="bi {{convert_to_star(3, book.rating)}}"></i>
+                          <i class="bi {{convert_to_star(4, book.rating)}}"></i>
+                          <i class="bi {{convert_to_star(5, book.rating)}}"></i>
+                        </span>
+                        <span class="ms-1">
+                            {{ book.rating }}
+                        </span>
+                    {% else %}
+                        <span>Нет оценок</span>
+                    {% endif %}
+                    <p class="card-text mt-3">{{ book.description }}</p>
+                    <p class="card-text">Жанр: {{ book.genre }}<br>Год издания: {{ book.year }}</p>
+                    <h4>{{ book.price }} ₽</h4>
+                    {% if current_user.is_authenticated %}
+                        {% if is_in_cart %}
+                            <p>Добавлено в козину ✅</p>
+                        {% else %}
+                            <a href="{{ url_for('main.add_to_cart', id=book.id) }}" class="btn btn-success">Добавить в корзину</a>
+                        {% endif %}
+                    {% else %}
+                        <div class="btn-group dropup">
+                          <button type="button" class="btn dropdown-toggle btn-success" data-bs-toggle="dropdown" aria-expanded="false">Добавить в корзину</button>
+                          <ul class="dropdown-menu"><li class="dropdown-item">Зарегистрируйтесь, чтобы добавлять предметы в корзину.</li></ul>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="reviews">
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pills-reviews-tab" data-bs-toggle="pill" data-bs-target="#pills-reviews" type="button" role="tab" aria-controls="pills-reviews" aria-selected="true">Отзывы ({{review_list|length}})</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-form-tab" data-bs-toggle="pill" data-bs-target="#pills-form" type="button" role="tab" aria-controls="pills-form" aria-selected="false">Оставить отзыв</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="pills-tabContent">
+            <div class="tab-pane fade show active" id="pills-reviews" role="tabpanel" aria-labelledby="pills-reviews-tab" tabindex="0">
+                <div class="review-container">
+                    {% if not review_list|length %}
+                        <p>У этой книги пока нет отзывов.</p>
+                    {% endif %}
+                    {% for review in review_list %}
+                        <div class="card">
+                          <div class="card-body">
+                            <h5 class="card-title">{{ authors_list[review.id] }}</h5>
+                              <p class="card-text">
+                            <span title="Рейтинг: {{ review.rating }}" style="color: orange;">
+                                      <i class="bi {{convert_to_star(1, review.rating)}}"></i>
+                                      <i class="bi {{convert_to_star(2, review.rating)}}"></i>
+                                      <i class="bi {{convert_to_star(3, review.rating)}}"></i>
+                                      <i class="bi {{convert_to_star(4, review.rating)}}"></i>
+                                      <i class="bi {{convert_to_star(5, review.rating)}}"></i>
+                            </span></p>
+                            <p class="card-text">{{ review.content }}</p>
+                          </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="tab-pane fade" id="pills-form" role="tabpanel" aria-labelledby="pills-form-tab" tabindex="0">
+                {% if current_user.is_authenticated %}
+                    <form action="{{url_for('main.add_review', id=book.id)}}" method="POST">
+                        <div class="ms-3 mb-3 rating-container">
+                            Оценка:
+                            <span class="star-rating">
+                              <i class="bi bi-star-fill rate-star" id="star1"></i>
+                              <i class="bi bi-star-fill rate-star" id="star2"></i>
+                              <i class="bi bi-star-fill rate-star" id="star3"></i>
+                              <i class="bi bi-star-fill rate-star" id="star4"></i>
+                              <i class="bi bi-star-fill rate-star" id="star5"></i>
+                              <input type="number" min="1" max="5" name="rating" id="rating" required>
+                            </span>
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" rows="3" placeholder="Напишите свой отзыв" name="content" type="text" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">Отправить</button>
+                    </form>
+                {% else %}
+                    <p>Зарегистрируйтесь, чтобы оставлять отзывы. </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block extra_js %}
+    <script src="{{ url_for('static', filename='js/star_rating.js') }}"></script>
+{% endblock %}

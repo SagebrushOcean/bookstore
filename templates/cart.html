@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Cart{% endblock %}
+
+{% block content %}
+    <h2 class="text-center">Корзина</h2>
+    <div class="cart-items">
+        {% for book in items_list %}
+        <div class="form-check">
+            <input form="cart-form" class="form-check-input hide" type="checkbox" value={{book.item_id}} name="item_id" id={{book.item_id}}>
+            <label class="form-check-label" for={{book.item_id}}>
+                <div class="row g-0">
+                    <div class="col-md-2" style="transform: rotate(0);">
+                        <img src="{{ url_for('static', filename=book.cover) }}" class="img-fluid item-cover" alt="обложка книги">
+                        <a class="stretched-link" href="{{ url_for('main.book_info', id=book.id) }}"></a>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="card-body item-card ms-2">
+                            <div class="card-info">
+                                <div>
+                                    <h5 class="card-title">{{ book.title.capitalize() }}</h5>
+                                    <p class="card-text">{{ book.author.title() }}</p>
+                                </div>
+                                <div>
+                                    <h5>{{ (book.price*book.amount)|round(2) }} ₽</h5>
+                                    <form class="amount-form mb-1" action="{{url_for('main.change_amount', id=book.item_id)}}">
+                                        <div class="number-input">
+                                            <button onclick="this.parentNode.querySelector('input[type=number]').stepDown()" ><i class="bi bi-dash-lg"></i></button>
+                                            <input class="quantity" min="1" max="20" name="new_amount" value="{{ book.amount }}" type="number" required>
+                                            <button onclick="this.parentNode.querySelector('input[type=number]').stepUp()"><i class="bi bi-plus-lg"></i></button>
+                                        </div>
+                                        <button class="btn btn-success btn-save" type="submit" title="Сохранить количество"><i class="bi bi-check-lg"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                            <a class="btn btn-danger align-self-start" href="{{ url_for('main.delete_from_cart', id=book.item_id) }}" onclick="return confirm('Вы уверены, что хотите удалить предмет из корзины?')"><i class="bi bi-trash3-fill"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </label>
+        </div>
+        {% endfor %}
+    </div>
+    {% if items_list %}
+        <form id="cart-form" action="{{url_for('main.new_order')}}" method="POST">
+            <button id="submit" class="btn btn-primary" type="submit">Оформить заказ</button>
+            <input type="checkbox" class="btn-check" id="select-all" onClick="toggle(this)" autocomplete="off">
+            <label class="btn btn-outline-success" for="select-all">Выбрать всё</label>
+        </form>
+    {% else %}
+        <div class="d-flex align-items-center h-100" style="max-height: 200px;">
+            <div class="placeholder-text text-center fs-4">Тут пока ничего нет.</div>
+        </div>
+    {% endif %}
+{% endblock %}
+{% block extra_js %}
+    <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+{% endblock %}

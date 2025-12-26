@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Orders{% endblock %}
+
+{% block content %}
+    <h2 class="text-center">Мои заказы</h2>
+    <div class="accordion orders-container" id="accordionExample">
+        {% for order in orders_list %}
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#f{{ order.id }}" aria-expanded="false" aria-controls="f{{ order.id }}">
+                    <div>
+                        <div class="mb-3">
+                            <span class="fw-medium">Заказ №{{ order.id }}</span>
+                            <small class="text-body-secondary">({{ order.date }})</small>
+                        </div>
+                        <span>Статус: {{ order.status }}</span>
+                    </div>
+                </button>
+            </h2>
+            <div id="f{{ order.id }}" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <p class="mb-1">Адрес доставки: {{ order.address }}</p>
+                    <p class="mb-0">Список товаров:</p>
+                    <ul class="mb-2">
+                    {% for order_item in orders_items[order.id] %}
+                        <li>{{ order_item[0] }} ({{ order_item[1] }} шт.)</li>
+                    {% endfor %}
+                    </ul>
+                    <p class="mb-1">Итого к оплате: {{ order.price }} ₽</p>
+                    <p class="mb-2">Оплата: при получении</p>
+                    <a class="btn btn-danger" href="{{ url_for('main.cancel_order', id=order.id) }}" onclick="return confirm('Вы уверены, что хотите отменить заказ?')">Отменить заказ</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% if not orders_list %}
+    <div class="d-flex align-items-center h-100" style="max-height: 200px;">
+        <div class="placeholder-text text-center fs-4">Тут пока ничего нет.</div>
+    </div>
+    {% endif %}
+{% endblock %}

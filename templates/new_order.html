@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Order{% endblock %}
+{% block content %}
+    <h2 class="mb-4 ms-5">Новый заказ</h2>
+    {% if items_list %}
+    <div class="ms-5">
+        <div class="books-container">
+            {% for item in items_list %}
+                <div class="order-item card">
+                    <div class="item-info mb-2">
+                        <img src="{{ url_for('static', filename=item.cover) }}" alt="обложка книги" class="item-cover img-fluid mb-1">
+                        <h6 class="mb-0">{{ item.title.capitalize() }}</h6>
+                        <small class="text-body-secondary">{{ item.author.title() }}</small>
+                    </div>
+                    <h6>{{ (item.price*item.amount)|round(2) }} ₽ ({{ item.amount }} шт.)</h6>
+                    <a style="color: black;" class="delete-item" href="{{ url_for('main.delete_order_item', id=item.item_id) }}"><i class="bi bi-x-square"></i></a>
+                </div>
+            {% endfor %}
+        </div>
+        <p class="mb-2">Итоговая цена: <span class="fw-medium">{{ final_price }} ₽</span></p>
+        <p class="pay mb-2">Оплата:<select class="form-select"><option>при получении</option></select></p>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            {{ form.delivery.label(class="form-label") }}<br>
+            <input id="delivery-0" name="delivery" class="btn-check" type="radio" value="pickup" required>
+            <label class="btn btn-outline-primary mb-3" for="delivery-0">самовывоз</label>
+            <input id="delivery-1" name="delivery" class="btn-check" type="radio" value="door" required>
+            <label class="btn btn-outline-primary mb-3" for="delivery-1">до двери</label>
+            <div>
+                <div class="mb-3 address hide">{{ form.address.label(class="form-label") }} {{ form.address(class="form-control") }}</div>
+                <div class="mb-3 pick_up hide">{{ form.pick_up.label(class="form-label") }} {{ form.pick_up(class="form-control") }}</div>
+            </div>
+            {{ form.final_price(value=final_price, type="hidden") }}
+            <button id="submit" type="submit" class="btn btn-success">Подтвердить заказ</button>
+        </form>
+    </div>
+    {% endif %}
+{% endblock %}
+{% block extra_js %}
+    <script src="{{ url_for('static', filename='js/new_order.js') }}"></script>
+{% endblock %}

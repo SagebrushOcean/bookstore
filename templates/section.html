@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Section{% endblock %}
+
+{% block content %}
+    <h2 class="text-center">{{ title }}</h2>
+    <div class="books-container">
+        {% for book in books_list %}
+        <div class="card book-card">
+            <img src="{{ url_for('static', filename=book.cover) }}" class="card-img-top book-cover" alt="обложка книги">
+            <div class="card-body">
+                <h6 class="card-title">{{ book.price }} ₽</h6>
+                <h5 class="book-title">{{ book.title.capitalize() }}</h5>
+                <p class="card-text mb-2" >{{ book.author.title() }}</p>
+                {% if book.rating %}
+                    <span title="Рейтинг: {{ book.rating }}" style="color: orange;">
+                      <i class="bi {{convert_to_star(1, book.rating)}}"></i>
+                      <i class="bi {{convert_to_star(2, book.rating)}}"></i>
+                      <i class="bi {{convert_to_star(3, book.rating)}}"></i>
+                      <i class="bi {{convert_to_star(4, book.rating)}}"></i>
+                      <i class="bi {{convert_to_star(5, book.rating)}}"></i>
+                    </span>
+                {% else %}
+                    <span>Нет оценок</span>
+                {% endif %}
+                <a href="{{ url_for('main.book_info', id=book.id) }}" class="stretched-link"></a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% if not books_list %}
+    <div class="d-flex align-items-center h-100" style="max-height: 200px;">
+        <div class="placeholder-text text-center fs-4">{{ placeholder }}</div>
+    </div>
+    {% endif %}
+{% endblock %}

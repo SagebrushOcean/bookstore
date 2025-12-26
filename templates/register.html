@@ -1,0 +1,28 @@
+{% extends "base2.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+    <h2 class="text-center mb-4">Регистрация</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div id="info">
+            <div class="mb-3">{{ form.name.label(class="form-label") }} {{ form.name(class="form-control") }}</div>
+            <div class="mb-3">{{ form.phone.label(class="form-label") }} {{ form.phone(class="form-control",pattern="\+[7]{1} \([0-9]{3}\) [0-9]{3}-[0-9]{2}-[0-9]{2}") }}</div>
+            <div class="mb-3">{{ form.email.label(class="form-label") }} {{ form.email(class="form-control",type="email") }}</div>
+            <div class="mb-3">{{ form.password.label(class="form-label") }} {{ form.password(class="form-control") }}</div>
+            <div class="mb-3">{{ form.confirm_password.label(class="form-label") }} {{ form.confirm_password(class="form-control") }}</div>
+        </div>
+        <div class="hide" id="confirm-number">
+            <p class="form-label text-center fs-5" id="input-code"></p>
+            <p>(код {{ code }})</p>
+            {{ form.confirm_phone(class="form-control",pattern="[0-9]{4}") }}
+        </div>
+        {{ form.code(value=code, type="hidden") }}
+        <button type="submit" id="submit" class="btn btn-primary mx-auto w-100 d-block mt-4" style="max-width: 240px;">Зарегистрироваться</button>
+    </form>
+    <p class="text-center">
+        Вы уже зарегистрированы? <a href="{{ url_for("main.login") }}">Войти</a><br>
+    </p>
+{% endblock %}
+{% block extra_js %}
+    <script src="{{ url_for('static', filename='js/register.js') }}"></script>
+{% endblock %}
